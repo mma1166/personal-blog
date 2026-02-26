@@ -17,8 +17,8 @@ export default function LoginPage() {
         setLoading(true);
         setError(null);
 
-        if (!supabase) {
-            // Mock login: validate password against saved profile (default: admin123)
+        // Always use localStorage password — no Supabase Auth needed for a personal blog
+        try {
             const stored = localStorage.getItem('admin_profile');
             const savedPw = stored ? (JSON.parse(stored).password || 'admin123') : 'admin123';
             if (password !== savedPw) {
@@ -29,22 +29,8 @@ export default function LoginPage() {
             localStorage.setItem('admin_mock_session', 'true');
             router.push('/admin');
             router.refresh();
-            return;
-        }
-
-        try {
-            const { error: authError } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (authError) throw authError;
-
-            router.push('/admin');
-            router.refresh();
-        } catch (err: any) {
-            setError(err.message || 'Failed to login');
-        } finally {
+        } catch {
+            setError('Login failed. Please try again.');
             setLoading(false);
         }
     };
