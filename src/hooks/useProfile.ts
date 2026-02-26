@@ -39,8 +39,20 @@ export function useProfile() {
 
     const saveProfile = (updates: Partial<Profile>) => {
         const updated = { ...profile, ...updates };
-        localStorage.setItem('admin_profile', JSON.stringify(updated));
-        setProfile(updated);
+        try {
+            localStorage.setItem('admin_profile', JSON.stringify(updated));
+            setProfile(updated);
+        } catch (e: any) {
+            if (e?.name === 'QuotaExceededError') {
+                // Profile photo base64 might be too large — save without photo
+                const withoutPhoto = { ...updated, photoUrl: '' };
+                localStorage.setItem('admin_profile', JSON.stringify(withoutPhoto));
+                setProfile(withoutPhoto);
+                alert('Profile saved, but the photo was too large to store (max ~3MB). Try a smaller image.');
+            } else {
+                alert('Failed to save profile: ' + e?.message);
+            }
+        }
     };
 
     return { profile, saveProfile, ready };

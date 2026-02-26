@@ -38,9 +38,9 @@ export default function NewPostPage() {
       });
       alert('Blog post created successfully!');
       router.push('/admin');
-    } catch (err) {
-      console.error(err);
-      alert('Error creating blog post.');
+    } catch (err: any) {
+      console.error('Blog creation error:', err);
+      alert('Error creating blog post: ' + (err?.message || err?.error_description || JSON.stringify(err)));
     }
   };
 
