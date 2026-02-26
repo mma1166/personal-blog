@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, Loader2 } from 'lucide-react';
-import { hashPassword, DEFAULT_PASSWORD_HASH } from '@/lib/cryptoUtils';
+import { hashPassword } from '@/lib/cryptoUtils';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -18,12 +18,10 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            // Load stored profile (or use defaults)
             const stored = localStorage.getItem('admin_profile');
             const profile = stored ? JSON.parse(stored) : null;
 
             const storedEmail = profile?.email || 'muntasir145@gmail.com';
-            const storedHash = profile?.password || DEFAULT_PASSWORD_HASH;
 
             // 1. Check email
             if (email.trim().toLowerCase() !== storedEmail.trim().toLowerCase()) {
@@ -32,12 +30,22 @@ export default function LoginPage() {
                 return;
             }
 
-            // 2. Hash the entered password and compare to stored hash
-            const enteredHash = await hashPassword(password);
-            if (enteredHash !== storedHash) {
-                setError('Invalid email or password.');
-                setLoading(false);
-                return;
+            // 2. Check password
+            if (!profile) {
+                // No profile saved yet — accept default password directly
+                if (password !== 'admin123') {
+                    setError('Invalid email or password.');
+                    setLoading(false);
+                    return;
+                }
+            } else {
+                // Profile exists — compare SHA-256 hashes
+                const enteredHash = await hashPassword(password);
+                if (enteredHash !== profile.password) {
+                    setError('Invalid email or password.');
+                    setLoading(false);
+                    return;
+                }
             }
 
             localStorage.setItem('admin_mock_session', 'true');
