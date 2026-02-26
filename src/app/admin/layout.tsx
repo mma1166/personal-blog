@@ -17,48 +17,18 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!supabase) {
-        // For development without supabase, check local storage for a mock session
-        const mockSession = typeof window !== 'undefined' ? localStorage.getItem('admin_mock_session') : null;
-        setIsAuthenticated(!!mockSession);
-        setLoading(false);
+    // Always use localStorage session — admin auth is handled locally, not via Supabase Auth
+    const mockSession = typeof window !== 'undefined' ? localStorage.getItem('admin_mock_session') : null;
+    setIsAuthenticated(!!mockSession);
+    setLoading(false);
 
-        if (!mockSession && pathname !== '/admin/login') {
-          router.push('/admin/login');
-        }
-        return;
-      }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-      setLoading(false);
-
-      if (!session && pathname !== '/admin/login') {
-        router.push('/admin/login');
-      }
-    };
-
-    checkAuth();
-
-    const { data: { subscription } } = supabase?.auth.onAuthStateChange((_event: any, session: any) => {
-      setIsAuthenticated(!!session);
-      if (!session && pathname !== '/admin/login') {
-        router.push('/admin/login');
-      }
-    }) || { data: { subscription: null } };
-
-    return () => {
-      subscription?.unsubscribe();
-    };
+    if (!mockSession && pathname !== '/admin/login') {
+      router.push('/admin/login');
+    }
   }, [pathname, router]);
 
-  const handleLogout = async () => {
-    if (supabase) {
-      await supabase.auth.signOut();
-    } else {
-      localStorage.removeItem('admin_mock_session');
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('admin_mock_session');
     setIsAuthenticated(false);
     router.push('/admin/login');
   };
