@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Camera, Loader2, X, Upload } from 'lucide-react';
+import { Camera, Loader2, X } from 'lucide-react';
 
 interface ImageUploadProps {
     value: string;
@@ -14,40 +13,27 @@ export default function ImageUpload({ value, onChange, label = "Featured Image" 
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        if (!supabase) {
-            // Mock upload
-            const mockUrl = URL.createObjectURL(file);
-            onChange(mockUrl);
+        // Validate size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image must be under 5MB.');
             return;
         }
 
-        try {
-            setUploading(true);
-            const fileExt = file.name.split('.').pop();
-            const fileName = `featured-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `featured-images/${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('images')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('images')
-                .getPublicUrl(filePath);
-
-            onChange(publicUrl);
-        } catch (error) {
-            console.error('Error uploading:', error);
-            alert('Upload failed. Ensure "images" bucket exists in Supabase.');
-        } finally {
+        setUploading(true);
+        const reader = new FileReader();
+        reader.onload = () => {
+            onChange(reader.result as string);
             setUploading(false);
-        }
+        };
+        reader.onerror = () => {
+            alert('Failed to read image. Please try another file.');
+            setUploading(false);
+        };
+        reader.readAsDataURL(file);
     };
 
     return (
