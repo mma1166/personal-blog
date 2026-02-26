@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { DEFAULT_PASSWORD_HASH } from '@/lib/cryptoUtils';
 
 export interface Profile {
     name: string;
     title: string;
     bio: string;
     photoUrl: string;
-    password: string;
+    email: string;
+    password: string; // stored as SHA-256 hex hash, NEVER plain text
 }
 
 const DEFAULT_PROFILE: Profile = {
@@ -15,7 +17,8 @@ const DEFAULT_PROFILE: Profile = {
     title: 'SQA Engineer · CS Graduate · Data Science Enthusiast',
     bio: "CS graduate from BRAC University & SQA Engineer at Tekarsh. I'm passionate about software quality, test automation, and the cutting edge of Data Science and Machine Learning. When I'm not debugging code, I'm out exploring the world — I love adventure, discovering new places, and experiencing cultures that broaden my perspective. This blog is where tech meets travel.",
     photoUrl: '',
-    password: 'admin123',
+    email: 'muntasir145@gmail.com',
+    password: DEFAULT_PASSWORD_HASH, // SHA-256 of 'admin123'
 };
 
 export function useProfile() {

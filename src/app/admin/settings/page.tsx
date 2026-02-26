@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Save, User, Shield, Camera, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import ImageUpload from '@/components/admin/ImageUpload';
+import { hashPassword, DEFAULT_PASSWORD_HASH } from '@/lib/cryptoUtils';
 
 export default function SettingsPage() {
     const { profile, saveProfile, ready } = useProfile();
@@ -48,11 +49,7 @@ export default function SettingsPage() {
         setTimeout(() => setProfileMsg(null), 3000);
     };
 
-    const handleChangePassword = () => {
-        if (currentPassword !== profile.password) {
-            setPwMsg({ type: 'error', text: 'Current password is incorrect.' });
-            return;
-        }
+    const handleChangePassword = async () => {
         if (newPassword.length < 6) {
             setPwMsg({ type: 'error', text: 'New password must be at least 6 characters.' });
             return;
@@ -61,7 +58,18 @@ export default function SettingsPage() {
             setPwMsg({ type: 'error', text: "Passwords don't match." });
             return;
         }
-        saveProfile({ password: newPassword });
+
+        // Verify current password by hashing it
+        const storedHash = profile.password || DEFAULT_PASSWORD_HASH;
+        const currentHash = await hashPassword(currentPassword);
+        if (currentHash !== storedHash) {
+            setPwMsg({ type: 'error', text: 'Current password is incorrect.' });
+            return;
+        }
+
+        // Hash and save the new password
+        const newHash = await hashPassword(newPassword);
+        saveProfile({ password: newHash });
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');

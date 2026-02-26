@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, Loader2 } from 'lucide-react';
+import { hashPassword, DEFAULT_PASSWORD_HASH } from '@/lib/cryptoUtils';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -17,15 +17,29 @@ export default function LoginPage() {
         setLoading(true);
         setError(null);
 
-        // Always use localStorage password — no Supabase Auth needed for a personal blog
         try {
+            // Load stored profile (or use defaults)
             const stored = localStorage.getItem('admin_profile');
-            const savedPw = stored ? (JSON.parse(stored).password || 'admin123') : 'admin123';
-            if (password !== savedPw) {
-                setError('Invalid password. Please try again.');
+            const profile = stored ? JSON.parse(stored) : null;
+
+            const storedEmail = profile?.email || 'muntasir145@gmail.com';
+            const storedHash = profile?.password || DEFAULT_PASSWORD_HASH;
+
+            // 1. Check email
+            if (email.trim().toLowerCase() !== storedEmail.trim().toLowerCase()) {
+                setError('Invalid email or password.');
                 setLoading(false);
                 return;
             }
+
+            // 2. Hash the entered password and compare to stored hash
+            const enteredHash = await hashPassword(password);
+            if (enteredHash !== storedHash) {
+                setError('Invalid email or password.');
+                setLoading(false);
+                return;
+            }
+
             localStorage.setItem('admin_mock_session', 'true');
             router.push('/admin');
             router.refresh();
