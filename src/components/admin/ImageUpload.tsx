@@ -17,17 +17,36 @@ export default function ImageUpload({ value, onChange, label = "Featured Image" 
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validate size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Image must be under 5MB.');
-            return;
-        }
-
         setUploading(true);
+
         const reader = new FileReader();
-        reader.onload = () => {
-            onChange(reader.result as string);
-            setUploading(false);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                // Resize to max 1200×675 preserving aspect ratio
+                const MAX_W = 1200;
+                const MAX_H = 675;
+                let { width, height } = img;
+
+                if (width > MAX_W) { height = Math.round(height * MAX_W / width); width = MAX_W; }
+                if (height > MAX_H) { width = Math.round(width * MAX_H / height); height = MAX_H; }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx!.drawImage(img, 0, 0, width, height);
+
+                // Encode as JPEG @ 80% quality — typically 50–200 KB
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                onChange(dataUrl);
+                setUploading(false);
+            };
+            img.onerror = () => {
+                alert('Could not load image. Please try another file.');
+                setUploading(false);
+            };
+            img.src = event.target?.result as string;
         };
         reader.onerror = () => {
             alert('Failed to read image. Please try another file.');

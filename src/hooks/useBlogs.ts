@@ -18,10 +18,10 @@ export function useBlogs() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Check if Supabase is configured
+    // Consistent with supabase.ts — only true when URL is a real HTTP URL
     const isSupabaseConfigured =
-        process.env.NEXT_PUBLIC_SUPABASE_URL &&
-        process.env.NEXT_PUBLIC_SUPABASE_URL !== 'your_supabase_url';
+        process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('http') &&
+        (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length ?? 0) > 10;
 
     const fetchBlogs = async () => {
         console.log('useBlogs: fetching blogs, configured:', isSupabaseConfigured);
