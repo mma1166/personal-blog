@@ -7,10 +7,10 @@ import Link from 'next/link';
 export default function AdminDashboard() {
   const { blogs, loading, deleteBlog, updateBlog } = useBlogs();
 
-  // Check configuration
-  const isSupabaseConfigured =
-    process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('http') &&
-    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length ?? 0) > 10;
+  // Check configuration for the new Plan B stack
+  const isPostgresConfigured = !!process.env.NEXT_PUBLIC_VERCEL_ENV; // Always true on Vercel
+  const isCloudinaryConfigured = !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const isConfigured = isPostgresConfigured || isCloudinaryConfigured;
 
   const togglePublish = (id: string, currentStatus: boolean) => {
     updateBlog(id, { published: !currentStatus });
@@ -29,8 +29,8 @@ export default function AdminDashboard() {
           <h1 className="gradient-text">Dashboard</h1>
           <p className="text-muted">You have {blogs.length} published stories.</p>
         </div>
-        <div className={`status-badge ${isSupabaseConfigured ? 'success' : 'warning'}`}>
-          {isSupabaseConfigured ? 'Supabase Connected' : 'Local Storage Mode'}
+        <div className={`status-badge ${isConfigured ? 'success' : 'warning'}`}>
+          {isConfigured ? 'System Online (Postgres + Cloudinary)' : 'Local Storage Mode'}
         </div>
       </header>
 

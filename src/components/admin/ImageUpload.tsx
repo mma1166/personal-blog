@@ -13,40 +13,37 @@ export default function ImageUpload({ value, onChange, label = "Featured Image" 
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setUploading(true);
 
         const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => {
-                // Resize to max 1200×675 preserving aspect ratio
-                const MAX_W = 1200;
-                const MAX_H = 675;
-                let { width, height } = img;
+        reader.onload = async (event) => {
+            try {
+                const base64Image = event.target?.result as string;
 
-                if (width > MAX_W) { height = Math.round(height * MAX_W / width); width = MAX_W; }
-                if (height > MAX_H) { width = Math.round(width * MAX_H / height); height = MAX_H; }
+                // POST to the new Cloudinary API route
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64Image }),
+                });
 
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx!.drawImage(img, 0, 0, width, height);
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.error || 'Upload failed');
+                }
 
-                // Encode as JPEG @ 80% quality — typically 50–200 KB
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                onChange(dataUrl);
+                const data = await res.json();
+                onChange(data.url); // Use the high-quality Cloudinary URL
+            } catch (err: any) {
+                console.error('Error uploading:', err);
+                alert('High-quality upload failed: ' + err.message);
+            } finally {
                 setUploading(false);
-            };
-            img.onerror = () => {
-                alert('Could not load image. Please try another file.');
-                setUploading(false);
-            };
-            img.src = event.target?.result as string;
+            }
         };
         reader.onerror = () => {
             alert('Failed to read image. Please try another file.');
@@ -62,7 +59,7 @@ export default function ImageUpload({ value, onChange, label = "Featured Image" 
             {value ? (
                 <div className="preview-container glass">
                     <img src={value} alt="Preview" className="preview-img" />
-                    <button className="remove-btn" onClick={() => onChange('')}>
+                    <button className="remove-btn" onClick={() => onChange('')} type="button">
                         <X size={16} />
                     </button>
                 </div>
@@ -74,13 +71,13 @@ export default function ImageUpload({ value, onChange, label = "Featured Image" 
                     {uploading ? (
                         <div className="status">
                             <Loader2 className="animate-spin" size={24} />
-                            <span>Uploading...</span>
+                            <span>Uploading High Quality...</span>
                         </div>
                     ) : (
                         <div className="status">
                             <Camera size={32} />
                             <span>Click to upload image</span>
-                            <p>or drag and drop</p>
+                            <p>Powered by Cloudinary</p>
                         </div>
                     )}
                 </div>
@@ -111,6 +108,7 @@ export default function ImageUpload({ value, onChange, label = "Featured Image" 
                     border-radius: 12px;
                     overflow: hidden;
                     aspect-ratio: 16 / 9;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
                 }
                 .preview-img {
                     width: 100%;

@@ -1,47 +1,46 @@
-import { createClient } from '@supabase/supabase-js';
+import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-function getAdminClient() {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-    if (!url || !serviceKey) {
-        throw new Error('Supabase environment variables not configured. Ensure SUPABASE_SERVICE_ROLE_KEY is in Vercel.');
-    }
-    return createClient(url, serviceKey);
-}
-
-// GET /api/blogs — fetch all blogs
+// GET /api/blogs — fetch all blogs via Prisma
 export async function GET() {
     try {
-        const supabase = getAdminClient();
-        const { data, error } = await supabase
-            .from('blogs')
-            .select('*')
-            .order('sort_order', { ascending: true })
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        return NextResponse.json(data || []);
+        const blogs = await prisma.blog.findMany({
+            orderBy: [
+                { sort_order: 'asc' },
+                { created_at: 'desc' }
+            ]
+        });
+        return NextResponse.json(blogs);
     } catch (err: any) {
         console.error('API GET ERROR:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
 
-// POST /api/blogs — create a new blog post
+// POST /api/blogs — create a new blog post via Prisma
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const supabase = getAdminClient();
-        const { data, error } = await supabase
-            .from('blogs')
-            .insert([body])
-            .select();
 
-        if (error) throw error;
-        return NextResponse.json(data);
+        // Match Prisma model field names
+        const blogData = {
+            title: body.title,
+            slug: body.slug || body.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+            content: body.content,
+            category: body.category,
+            published: body.published ?? false,
+            featured: body.featured ?? false,
+            image_url: body.image_url,
+            sort_order: parseInt(body.sort_order) || 999
+        };
+
+        const newBlog = await prisma.blog.create({
+            data: blogData
+        });
+
+        return NextResponse.json(newBlog);
     } catch (err: any) {
         console.error('API POST ERROR:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
