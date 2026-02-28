@@ -66,9 +66,12 @@ export default function SettingsPage() {
             return;
         }
 
+        const hashedCurrent = await hashPassword(currentPassword);
+        const hashedNew = await hashPassword(newPassword);
+
         const res = await saveProfile({
-            current_password: currentPassword,
-            new_password: newPassword
+            current_password: hashedCurrent,
+            new_password: hashedNew
         });
 
         if (res.success) {
