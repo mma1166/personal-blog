@@ -5,86 +5,91 @@ import { Edit3, Trash2, Eye, ExternalLink, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
-    const { blogs, loading, deleteBlog, updateBlog } = useBlogs();
+  const { blogs, loading, deleteBlog, updateBlog } = useBlogs();
 
-    const togglePublish = (id: string, currentStatus: boolean) => {
-        updateBlog(id, { published: !currentStatus });
-    };
+  // Check configuration
+  const isSupabaseConfigured =
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('http') &&
+    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length ?? 0) > 10;
 
-    const handleDelete = (id: string) => {
-        if (confirm('Are you sure you want to delete this post?')) {
-            deleteBlog(id);
-        }
-    };
+  const togglePublish = (id: string, currentStatus: boolean) => {
+    updateBlog(id, { published: !currentStatus });
+  };
 
-    return (
-        <div className="admin-dashboard">
-            <header className="dashboard-header">
-                <h1 className="gradient-text">Dashboard</h1>
-                <p className="text-muted">You have {blogs.length} published stories.</p>
-            </header>
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this post?')) {
+      deleteBlog(id);
+    }
+  };
 
-            <div className="stats-grid">
-                <div className="stat-card glass">
-                    <span className="stat-label">Total Views</span>
-                    <span className="stat-value">12.4K</span>
-                </div>
-                <div className="stat-card glass">
-                    <span className="stat-label">Total Blogs</span>
-                    <span className="stat-value">{blogs.length}</span>
-                </div>
-                <div className="stat-card glass">
-                    <span className="stat-label">Avg. Reading Time</span>
-                    <span className="stat-value">5 min</span>
-                </div>
-            </div>
+  return (
+    <div className="admin-dashboard">
+      <header className="dashboard-header">
+        <h1 className="gradient-text">Dashboard</h1>
+        <p className="text-muted">You have {blogs.length} published stories.</p>
+      </header>
 
-            <div className="blogs-table-container glass">
-                <table className="blogs-table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan={4}>Loading blogs...</td></tr>
-                        ) : blogs.length === 0 ? (
-                            <tr><td colSpan={4}>No blogs found. Create your first post!</td></tr>
-                        ) : blogs.map((blog) => (
-                            <tr key={blog.id}>
-                                <td>
-                                    <div className="blog-id-cell">
-                                        <span className="blog-title">{blog.title}</span>
-                                        <span className="blog-slug">/{blog.slug}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className={`status-badge ${blog.published ? 'published' : 'draft'}`}>
-                                        {blog.published ? 'Published' : 'Draft'}
-                                    </span>
-                                </td>
-                                <td>{new Date(blog.created_at).toLocaleDateString()}</td>
-                                <td className="actions-cell">
-                                    <div className="action-btns">
-                                        <Link href={`/blog/${blog.slug}`} target="_blank" title="View"><ExternalLink size={18} /></Link>
-                                        <Link href={`/admin/edit/${blog.id}`} title="Edit"><Edit3 size={18} /></Link>
-                                        <button onClick={() => togglePublish(blog.id, blog.published)} title={blog.published ? 'Unpublish' : 'Publish'}>
-                                            <Eye size={18} />
-                                        </button>
-                                        <button className="delete" onClick={() => handleDelete(blog.id)} title="Delete"><Trash2 size={18} /></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+      <div className="stats-grid">
+        <div className="stat-card glass">
+          <span className="stat-label">Total Views</span>
+          <span className="stat-value">12.4K</span>
+        </div>
+        <div className="stat-card glass">
+          <span className="stat-label">Total Blogs</span>
+          <span className="stat-value">{blogs.length}</span>
+        </div>
+        <div className="stat-card glass">
+          <span className="stat-label">Avg. Reading Time</span>
+          <span className="stat-value">5 min</span>
+        </div>
+      </div>
 
-            <style jsx>{`
+      <div className="blogs-table-container glass">
+        <table className="blogs-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={4}>Loading blogs...</td></tr>
+            ) : blogs.length === 0 ? (
+              <tr><td colSpan={4}>No blogs found. Create your first post!</td></tr>
+            ) : blogs.map((blog) => (
+              <tr key={blog.id}>
+                <td>
+                  <div className="blog-id-cell">
+                    <span className="blog-title">{blog.title}</span>
+                    <span className="blog-slug">/{blog.slug}</span>
+                  </div>
+                </td>
+                <td>
+                  <span className={`status-badge ${blog.published ? 'published' : 'draft'}`}>
+                    {blog.published ? 'Published' : 'Draft'}
+                  </span>
+                </td>
+                <td>{new Date(blog.created_at).toLocaleDateString()}</td>
+                <td className="actions-cell">
+                  <div className="action-btns">
+                    <Link href={`/blog/${blog.slug}`} target="_blank" title="View"><ExternalLink size={18} /></Link>
+                    <Link href={`/admin/edit/${blog.id}`} title="Edit"><Edit3 size={18} /></Link>
+                    <button onClick={() => togglePublish(blog.id, blog.published)} title={blog.published ? 'Unpublish' : 'Publish'}>
+                      <Eye size={18} />
+                    </button>
+                    <button className="delete" onClick={() => handleDelete(blog.id)} title="Delete"><Trash2 size={18} /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <style jsx>{`
         .admin-dashboard {
           padding-top: 1rem;
         }
@@ -176,6 +181,6 @@ export default function AdminDashboard() {
           color: #ef4444;
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }

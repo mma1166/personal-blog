@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-// Server-side Supabase client using service role key — bypasses RLS completely
+export const dynamic = 'force-dynamic';
+
 function getAdminClient() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     if (!url || !serviceKey) {
-        throw new Error('Supabase environment variables not configured');
+        throw new Error('Supabase environment variables not configured. Ensure SUPABASE_SERVICE_ROLE_KEY is in Vercel.');
     }
     return createClient(url, serviceKey);
 }
@@ -24,6 +25,7 @@ export async function GET() {
         if (error) throw error;
         return NextResponse.json(data || []);
     } catch (err: any) {
+        console.error('API GET ERROR:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
@@ -41,6 +43,7 @@ export async function POST(request: Request) {
         if (error) throw error;
         return NextResponse.json(data);
     } catch (err: any) {
+        console.error('API POST ERROR:', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
