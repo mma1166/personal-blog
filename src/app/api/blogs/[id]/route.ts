@@ -11,14 +11,15 @@ function getAdminClient() {
 }
 
 // PUT /api/blogs/[id] — update a blog post
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const body = await request.json();
         const supabase = getAdminClient();
         const { error } = await supabase
             .from('blogs')
             .update(body)
-            .eq('id', params.id);
+            .eq('id', id);
 
         if (error) throw error;
         return NextResponse.json({ success: true });
@@ -28,13 +29,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // DELETE /api/blogs/[id] — delete a blog post
-export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const supabase = getAdminClient();
         const { error } = await supabase
             .from('blogs')
             .delete()
-            .eq('id', params.id);
+            .eq('id', id);
 
         if (error) throw error;
         return NextResponse.json({ success: true });
