@@ -25,8 +25,13 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <header className="dashboard-header">
-        <h1 className="gradient-text">Dashboard</h1>
-        <p className="text-muted">You have {blogs.length} published stories.</p>
+        <div>
+          <h1 className="gradient-text">Dashboard</h1>
+          <p className="text-muted">You have {blogs.length} published stories.</p>
+        </div>
+        <div className={`status-badge ${isSupabaseConfigured ? 'success' : 'warning'}`}>
+          {isSupabaseConfigured ? 'Supabase Connected' : 'Local Storage Mode'}
+        </div>
       </header>
 
       <div className="stats-grid">
@@ -151,11 +156,11 @@ export default function AdminDashboard() {
           font-size: 0.75rem;
           font-weight: 700;
         }
-        .status-badge.published {
+        .status-badge.published, .status-badge.success {
           background: rgba(34, 197, 94, 0.2);
           color: #4ade80;
         }
-        .status-badge.draft {
+        .status-badge.draft, .status-badge.warning {
           background: rgba(234, 179, 8, 0.2);
           color: #facc15;
         }
