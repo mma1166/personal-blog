@@ -18,41 +18,24 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const stored = localStorage.getItem('admin_profile');
-            const profile = stored ? JSON.parse(stored) : null;
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
 
-            const storedEmail = profile?.email || 'muntasir145@gmail.com';
+            const data = await res.json();
 
-            // 1. Check email
-            if (email.trim().toLowerCase() !== storedEmail.trim().toLowerCase()) {
-                setError('Invalid email or password.');
+            if (!res.ok) {
+                setError(data.error || 'Invalid credentials.');
                 setLoading(false);
                 return;
             }
 
-            // 2. Check password
-            if (!profile) {
-                // No profile saved yet — accept default password directly
-                if (password !== 'admin123') {
-                    setError('Invalid email or password.');
-                    setLoading(false);
-                    return;
-                }
-            } else {
-                // Profile exists — compare SHA-256 hashes
-                const enteredHash = await hashPassword(password);
-                if (enteredHash !== profile.password) {
-                    setError('Invalid email or password.');
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            localStorage.setItem('admin_mock_session', 'true');
             router.push('/admin');
             router.refresh();
-        } catch {
-            setError('Login failed. Please try again.');
+        } catch (err: any) {
+            setError('Login failed: ' + err.message);
             setLoading(false);
         }
     };

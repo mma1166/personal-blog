@@ -1,59 +1,71 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DEFAULT_PASSWORD_HASH } from '@/lib/cryptoUtils';
 
 export interface Profile {
+    id?: string;
     name: string;
-    title: string;
     bio: string;
-    photoUrl: string;
+    profile_url: string;
     email: string;
-    password: string; // stored as SHA-256 hex hash, NEVER plain text
 }
 
 const DEFAULT_PROFILE: Profile = {
     name: 'Muntasir Mahmud Amit',
-    title: 'SQA Engineer · CS Graduate · Data Science Enthusiast',
-    bio: "CS graduate from BRAC University & SQA Engineer at Tekarsh. I'm passionate about software quality, test automation, and the cutting edge of Data Science and Machine Learning. When I'm not debugging code, I'm out exploring the world — I love adventure, discovering new places, and experiencing cultures that broaden my perspective. This blog is where tech meets travel.",
-    photoUrl: '',
+    bio: "CS graduate from BRAC University & SQA Engineer at Tekarsh. tech meets travel.",
+    profile_url: '',
     email: 'muntasir145@gmail.com',
-    password: DEFAULT_PASSWORD_HASH, // SHA-256 of 'admin123'
 };
 
 export function useProfile() {
     const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
-    const [ready, setReady] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const stored = localStorage.getItem('admin_profile');
-        if (stored) {
-            try {
-                setProfile({ ...DEFAULT_PROFILE, ...JSON.parse(stored) });
-            } catch {
-                // ignore parse errors, keep defaults
-            }
-        }
-        setReady(true);
-    }, []);
-
-    const saveProfile = (updates: Partial<Profile>) => {
-        const updated = { ...profile, ...updates };
+    const fetchProfile = async () => {
         try {
-            localStorage.setItem('admin_profile', JSON.stringify(updated));
-            setProfile(updated);
-        } catch (e: any) {
-            if (e?.name === 'QuotaExceededError') {
-                // Profile photo base64 might be too large — save without photo
-                const withoutPhoto = { ...updated, photoUrl: '' };
-                localStorage.setItem('admin_profile', JSON.stringify(withoutPhoto));
-                setProfile(withoutPhoto);
-                alert('Profile saved, but the photo was too large to store (max ~3MB). Try a smaller image.');
-            } else {
-                alert('Failed to save profile: ' + e?.message);
+            setLoading(true);
+            const res = await fetch('/api/profile');
+            if (res.ok) {
+                const data = await res.json();
+                setProfile(data);
+            } else if (res.status === 404) {
+                // Initial user doesn't exist yet - setup logic in login will handle this
+                setProfile(DEFAULT_PROFILE);
             }
+        } catch (err: any) {
+            console.error("Profile fetch error:", err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
-    return { profile, saveProfile, ready };
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const saveProfile = async (updates: Partial<Profile> & { current_password?: string; new_password?: string }) => {
+        try {
+            setLoading(true);
+            const res = await fetch('/api/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to save profile');
+
+            setProfile(data.user);
+            return { success: true };
+        } catch (err: any) {
+            console.error('Error saving profile:', err);
+            return { success: false, error: err.message };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { profile, saveProfile, loading, error, refreshProfile: fetchProfile };
 }

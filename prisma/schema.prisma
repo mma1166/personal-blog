@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Blog {
@@ -21,4 +21,15 @@ model Blog {
   image_url   String?  @db.Text
   sort_order  Int      @default(999)
   created_at  DateTime @default(now())
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String   // Hashed password
+  name         String?
+  bio          String?  @db.Text
+  profile_url  String?  @db.Text
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }

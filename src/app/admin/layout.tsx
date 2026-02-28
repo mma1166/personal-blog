@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, PlusCircle, Settings, LogOut, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 export default function AdminLayout({
   children,
@@ -17,20 +16,39 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
-    // Always use localStorage session — admin auth is handled locally, not via Supabase Auth
-    const mockSession = typeof window !== 'undefined' ? localStorage.getItem('admin_mock_session') : null;
-    setIsAuthenticated(!!mockSession);
-    setLoading(false);
-
-    if (!mockSession && pathname !== '/admin/login') {
-      router.push('/admin/login');
-    }
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          setIsAuthenticated(data.authenticated);
+        } else {
+          setIsAuthenticated(false);
+          if (pathname !== '/admin/login') {
+            router.push('/admin/login');
+          }
+        }
+      } catch (err) {
+        setIsAuthenticated(false);
+        if (pathname !== '/admin/login') {
+          router.push('/admin/login');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
   }, [pathname, router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_mock_session');
-    setIsAuthenticated(false);
-    router.push('/admin/login');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setIsAuthenticated(false);
+      router.push('/admin/login');
+      router.refresh();
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
   };
 
   if (loading) {

@@ -49,8 +49,8 @@ export default function Home() {
           className="hero-inner container"
         >
           <div className="hero-avatar">
-            {profile.photoUrl ? (
-              <img src={profile.photoUrl} alt={profile.name} />
+            {profile.profile_url ? (
+              <img src={profile.profile_url} alt={profile.name} />
             ) : (
               <div className="avatar-fallback"><User size={44} /></div>
             )}
@@ -80,7 +80,7 @@ export default function Home() {
               transition={{ delay: 0.38 }}
               className="hero-title-tag"
             >
-              {profile.title}
+              SQA Engineer · CS Graduate
             </motion.p>
             <motion.p
               initial={{ opacity: 0, y: 20 }}

@@ -8,13 +8,13 @@ import ImageUpload from '@/components/admin/ImageUpload';
 import { hashPassword, DEFAULT_PASSWORD_HASH } from '@/lib/cryptoUtils';
 
 export default function SettingsPage() {
-    const { profile, saveProfile, ready } = useProfile();
+    const { profile, saveProfile, loading } = useProfile();
 
     // Profile state
     const [name, setName] = useState('');
     const [title, setTitle] = useState('');
     const [bio, setBio] = useState('');
-    const [photoUrl, setPhotoUrl] = useState('');
+    const [profileUrl, setProfileUrl] = useState('');
 
     // Password state
     const [currentPassword, setCurrentPassword] = useState('');
@@ -28,28 +28,35 @@ export default function SettingsPage() {
     const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [pwMsg, setPwMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-    // Sync form once profile data is ready from localStorage
+    // Sync form once profile data is ready from API
     useEffect(() => {
-        if (ready) {
+        if (profile) {
             setName(profile.name);
-            setTitle(profile.title || '');
-            setBio(profile.bio);
-            setPhotoUrl(profile.photoUrl);
+            setBio(profile.bio || '');
+            setProfileUrl(profile.profile_url || '');
         }
-    }, [ready]);
+    }, [profile]);
 
 
-    const handleSaveProfile = () => {
+    const handleSaveProfile = async () => {
         if (!name.trim()) {
             setProfileMsg({ type: 'error', text: 'Name cannot be empty.' });
             return;
         }
-        saveProfile({ name: name.trim(), title: title.trim(), bio: bio.trim(), photoUrl });
-        setProfileMsg({ type: 'success', text: 'Profile updated successfully!' });
+        const res = await saveProfile({ name: name.trim(), bio: bio.trim(), profile_url: profileUrl });
+        if (res.success) {
+            setProfileMsg({ type: 'success', text: 'Profile updated successfully!' });
+        } else {
+            setProfileMsg({ type: 'error', text: res.error || 'Failed to update profile.' });
+        }
         setTimeout(() => setProfileMsg(null), 3000);
     };
 
     const handleChangePassword = async () => {
+        if (!currentPassword) {
+            setPwMsg({ type: 'error', text: 'Enter current password.' });
+            return;
+        }
         if (newPassword.length < 6) {
             setPwMsg({ type: 'error', text: 'New password must be at least 6 characters.' });
             return;
@@ -59,21 +66,19 @@ export default function SettingsPage() {
             return;
         }
 
-        // Verify current password by hashing it
-        const storedHash = profile.password || DEFAULT_PASSWORD_HASH;
-        const currentHash = await hashPassword(currentPassword);
-        if (currentHash !== storedHash) {
-            setPwMsg({ type: 'error', text: 'Current password is incorrect.' });
-            return;
-        }
+        const res = await saveProfile({
+            current_password: currentPassword,
+            new_password: newPassword
+        });
 
-        // Hash and save the new password
-        const newHash = await hashPassword(newPassword);
-        saveProfile({ password: newHash });
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        setPwMsg({ type: 'success', text: 'Password changed successfully!' });
+        if (res.success) {
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setPwMsg({ type: 'success', text: 'Password changed successfully!' });
+        } else {
+            setPwMsg({ type: 'error', text: res.error || 'Failed to change password.' });
+        }
         setTimeout(() => setPwMsg(null), 3000);
     };
 
@@ -100,8 +105,8 @@ export default function SettingsPage() {
 
                     <div className="photo-row">
                         <div className="photo-preview">
-                            {photoUrl ? (
-                                <img src={photoUrl} alt="Profile" />
+                            {profileUrl ? (
+                                <img src={profileUrl} alt="Profile" />
                             ) : (
                                 <div className="photo-placeholder">
                                     <Camera size={32} />
@@ -110,7 +115,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="photo-upload-wrapper">
                             <p className="upload-hint">This photo appears on your homepage.</p>
-                            <ImageUpload value={photoUrl} onChange={setPhotoUrl} label="Profile Photo" />
+                            <ImageUpload value={profileUrl} onChange={setProfileUrl} label="Profile Photo" />
                         </div>
                     </div>
 
