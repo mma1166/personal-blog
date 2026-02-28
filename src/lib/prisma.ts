@@ -1,11 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-    // For Prisma 7, if the schema is empty, we must provide the URL.
-    // We use a cast to bypass the current strict type issue in the constructor.
-    return new (PrismaClient as any)({
-        datasourceUrl: process.env.POSTGRES_PRISMA_URL,
-    })
+    return new PrismaClient()
 }
 
 declare global {

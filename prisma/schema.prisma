@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // url and directUrl are now in prisma.config.ts (Prisma 7 standard)
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model Blog {
