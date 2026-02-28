@@ -11,7 +11,6 @@ import Placeholder from '@tiptap/extension-placeholder';
 import EditorToolbar from './EditorToolbar';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { supabase } from '@/lib/supabase';
 import { Loader2, Maximize, Crop } from 'lucide-react';
 import { Extension } from '@tiptap/core';
 
@@ -232,27 +231,31 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
     const [uploading, setUploading] = useState(false);
 
     const uploadImage = async (file: File) => {
-        if (!supabase) return URL.createObjectURL(file);
-
         try {
             setUploading(true);
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `blog-images/${fileName}`;
+            const reader = new FileReader();
 
-            const { error: uploadError } = await supabase.storage
-                .from('images')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('images')
-                .getPublicUrl(filePath);
-
-            return publicUrl;
+            return new Promise<string>((resolve, reject) => {
+                reader.onload = async (event) => {
+                    try {
+                        const base64Image = event.target?.result as string;
+                        const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: base64Image }),
+                        });
+                        if (!res.ok) throw new Error('Cloudinary upload failed');
+                        const data = await res.json();
+                        resolve(data.url);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = () => reject(new Error('File reader failed'));
+                reader.readAsDataURL(file);
+            });
         } catch (error) {
-            console.error('Error uploading:', error);
+            console.error('Error uploading to Cloudinary:', error);
             return null;
         } finally {
             setUploading(false);

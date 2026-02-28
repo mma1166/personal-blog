@@ -17,13 +17,13 @@ export function useBlogs() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Use API routes when Supabase URL is configured, localStorage otherwise
-    const isSupabaseConfigured =
-        process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('http') &&
-        (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length ?? 0) > 10;
+    // Check if the new Pro stack (Postgres + Cloudinary) is available
+    const isConfigured =
+        process.env.NEXT_PUBLIC_VERCEL_ENV !== undefined ||
+        process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME !== undefined;
 
     const fetchBlogs = async () => {
-        if (!isSupabaseConfigured) {
+        if (!isConfigured) {
             // LocalStorage fallback for local dev without Supabase
             const local = typeof window !== 'undefined' ? localStorage.getItem('local_blogs') : null;
             if (!local) {
@@ -86,7 +86,7 @@ export function useBlogs() {
     };
 
     const createBlog = async (blog: Partial<Blog>) => {
-        if (!isSupabaseConfigured) {
+        if (!isConfigured) {
             const newBlog = {
                 ...blog,
                 id: Math.random().toString(36).substr(2, 9),
@@ -111,7 +111,7 @@ export function useBlogs() {
     };
 
     const updateBlog = async (id: string, updates: Partial<Blog>) => {
-        if (!isSupabaseConfigured) {
+        if (!isConfigured) {
             const updated = blogs.map(b => b.id === id ? { ...b, ...updates } : b);
             localStorage.setItem('local_blogs', JSON.stringify(updated));
             fetchBlogs();
@@ -129,7 +129,7 @@ export function useBlogs() {
     };
 
     const deleteBlog = async (id: string) => {
-        if (!isSupabaseConfigured) {
+        if (!isConfigured) {
             const updated = blogs.filter(b => b.id !== id);
             localStorage.setItem('local_blogs', JSON.stringify(updated));
             setBlogs(updated);
