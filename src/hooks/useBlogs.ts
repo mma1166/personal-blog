@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export interface Blog {
     id: string;
@@ -18,14 +17,14 @@ export function useBlogs() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Consistent with supabase.ts — only true when URL is a real HTTP URL
+    // Use API routes when Supabase URL is configured, localStorage otherwise
     const isSupabaseConfigured =
         process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('http') &&
         (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length ?? 0) > 10;
 
     const fetchBlogs = async () => {
-        console.log('useBlogs: fetching blogs, configured:', isSupabaseConfigured);
         if (!isSupabaseConfigured) {
+            // LocalStorage fallback for local dev without Supabase
             const local = typeof window !== 'undefined' ? localStorage.getItem('local_blogs') : null;
             if (!local) {
                 const initialMocks = [
@@ -58,7 +57,6 @@ export function useBlogs() {
                 setBlogs(initialMocks);
             } else {
                 const parsed = JSON.parse(local);
-                // Sort by sort_order ascending, then created_at descending
                 const sorted = parsed.sort((a: Blog, b: Blog) => {
                     const orderA = a.sort_order ?? 999;
                     const orderB = b.sort_order ?? 999;
@@ -68,18 +66,17 @@ export function useBlogs() {
                 setBlogs(sorted);
             }
             setLoading(false);
-            console.log('useBlogs: Loaded from local storage');
             return;
         }
 
+        // Use server-side API route — bypasses Supabase RLS completely
         try {
-            const { data, error } = await supabase
-                .from('blogs')
-                .select('*')
-                .order('sort_order', { ascending: true })
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
+            const res = await fetch('/api/blogs');
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to fetch blogs');
+            }
+            const data = await res.json();
             setBlogs(data || []);
         } catch (err) {
             console.error('Error fetching blogs:', err);
@@ -98,15 +95,17 @@ export function useBlogs() {
             } as Blog;
             const updated = [newBlog, ...blogs];
             localStorage.setItem('local_blogs', JSON.stringify(updated));
-            fetchBlogs(); // Re-fetch to apply sort
+            fetchBlogs();
             return [newBlog];
         }
 
-        const { data, error } = await supabase
-            .from('blogs')
-            .insert([blog])
-            .select();
-        if (error) throw error;
+        const res = await fetch('/api/blogs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(blog),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create blog');
         fetchBlogs();
         return data;
     };
@@ -115,15 +114,17 @@ export function useBlogs() {
         if (!isSupabaseConfigured) {
             const updated = blogs.map(b => b.id === id ? { ...b, ...updates } : b);
             localStorage.setItem('local_blogs', JSON.stringify(updated));
-            fetchBlogs(); // Re-fetch to apply sort
+            fetchBlogs();
             return;
         }
 
-        const { error } = await supabase
-            .from('blogs')
-            .update(updates)
-            .eq('id', id);
-        if (error) throw error;
+        const res = await fetch(`/api/blogs/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update blog');
         fetchBlogs();
     };
 
@@ -135,11 +136,9 @@ export function useBlogs() {
             return;
         }
 
-        const { error } = await supabase
-            .from('blogs')
-            .delete()
-            .eq('id', id);
-        if (error) throw error;
+        const res = await fetch(`/api/blogs/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete blog');
         fetchBlogs();
     };
 
