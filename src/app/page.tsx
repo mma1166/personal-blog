@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useBlogs } from '@/hooks/useBlogs';
 import { useProfile } from '@/hooks/useProfile';
-import { ArrowRight, Calendar, User, Cpu, Compass, LayoutGrid, BookOpen } from 'lucide-react';
+import { ArrowRight, Calendar, User, Cpu, Compass, LayoutGrid, BookOpen, Clock } from 'lucide-react';
 
 const CATEGORIES = [
   { label: 'All Posts', value: 'all', icon: LayoutGrid },
@@ -179,6 +179,9 @@ export default function Home() {
                     <div className="post-meta">
                       <Calendar size={14} />
                       {new Date(featured.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      <span className="dot">•</span>
+                      <Clock size={14} />
+                      {Math.max(1, Math.ceil(featured.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(w => w.length > 0).length / 200))} min
                     </div>
                     <span className="read-cta">
                       Read Article <ArrowRight size={16} />
@@ -231,6 +234,9 @@ export default function Home() {
                         <div className="post-meta">
                           <Calendar size={13} />
                           {new Date(blog.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          <span className="dot">•</span>
+                          <Clock size={13} />
+                          {Math.max(1, Math.ceil(blog.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(w => w.length > 0).length / 200))} min
                         </div>
                         <ArrowRight size={16} className="arrow-icon" />
                       </div>

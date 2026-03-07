@@ -268,6 +268,17 @@ export default function BlogPostPage() {
                   </div>
                 </div>
 
+                <div className="meta-divider" />
+
+                <div className="meta-item">
+                  <Clock size={18} className="meta-icon" />
+                  <div className="meta-text">
+                    <span className="label">Read Time</span>
+                    <span className="value">
+                      {Math.max(1, Math.ceil((post.content || '').replace(/<[^>]*>/g, '').trim().split(/\s+/).filter((w: string) => w.length > 0).length / 200))} min
+                    </span>
+                  </div>
+                </div>
               </div>
             </header>
 

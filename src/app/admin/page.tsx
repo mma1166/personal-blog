@@ -12,6 +12,17 @@ export default function AdminDashboard() {
   const isCloudinaryConfigured = !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const isConfigured = isPostgresConfigured || isCloudinaryConfigured;
 
+  // Calculate stats dynamically
+  const calculateReadingTime = (content: string) => {
+    const wordsPerMinute = 200;
+    const text = content.replace(/<[^>]*>/g, '');
+    const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+  };
+
+  const totalReadingTime = blogs.reduce((acc, blog) => acc + calculateReadingTime(blog.content), 0);
+  const avgReadingTime = blogs.length > 0 ? Math.round(totalReadingTime / blogs.length) : 0;
+
   const togglePublish = (id: string, currentStatus: boolean) => {
     updateBlog(id, { published: !currentStatus });
   };
@@ -36,16 +47,12 @@ export default function AdminDashboard() {
 
       <div className="stats-grid">
         <div className="stat-card glass">
-          <span className="stat-label">Total Views</span>
-          <span className="stat-value">12.4K</span>
-        </div>
-        <div className="stat-card glass">
           <span className="stat-label">Total Blogs</span>
           <span className="stat-value">{blogs.length}</span>
         </div>
         <div className="stat-card glass">
           <span className="stat-label">Avg. Reading Time</span>
-          <span className="stat-value">5 min</span>
+          <span className="stat-value">{avgReadingTime} min</span>
         </div>
       </div>
 
@@ -103,7 +110,7 @@ export default function AdminDashboard() {
         }
         .stats-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 1.5rem;
           margin-bottom: 3rem;
         }
