@@ -47,7 +47,7 @@ export default function TravelPage() {
                                     <div className="featured-footer">
                                         <div className="post-meta">
                                             <Calendar size={14} />
-                                            {new Date(featured.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            {new Date(featured.created_at).toLocaleDateString('en-GB')}
                                         </div>
                                         <span className="read-cta">Read Story <ArrowRight size={16} /></span>
                                     </div>
@@ -73,7 +73,7 @@ export default function TravelPage() {
                                         <h3 className="post-card-title">{blog.title}</h3>
                                         <p className="post-card-excerpt">{blog.content.replace(/<[^>]*>/g, '').substring(0, 120)}...</p>
                                         <div className="post-card-footer">
-                                            <div className="post-meta"><Calendar size={13} />{new Date(blog.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                            <div className="post-meta"><Calendar size={13} />{new Date(blog.created_at).toLocaleDateString('en-GB')}</div>
                                             <ArrowRight size={16} className="arrow-icon" />
                                         </div>
                                     </div>

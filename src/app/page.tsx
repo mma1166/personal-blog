@@ -178,7 +178,7 @@ export default function Home() {
                   <div className="featured-footer">
                     <div className="post-meta">
                       <Calendar size={14} />
-                      {new Date(featured.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(featured.created_at).toLocaleDateString('en-GB')}
                       <span className="dot">•</span>
                       <Clock size={14} />
                       {Math.max(1, Math.ceil(featured.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(w => w.length > 0).length / 200))} min
@@ -233,7 +233,7 @@ export default function Home() {
                       <div className="post-card-footer">
                         <div className="post-meta">
                           <Calendar size={13} />
-                          {new Date(blog.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          {new Date(blog.created_at).toLocaleDateString('en-GB')}
                           <span className="dot">•</span>
                           <Clock size={13} />
                           {Math.max(1, Math.ceil(blog.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(w => w.length > 0).length / 200))} min

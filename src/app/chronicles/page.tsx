@@ -9,79 +9,47 @@ import { ArrowRight, Calendar, BookOpen } from 'lucide-react';
 export default function ChroniclesPage() {
     const { blogs, loading } = useBlogs();
 
-    const chronicles = blogs.filter(b =>
+    const chroniclesBlogs = blogs.filter(b =>
         b.published && b.category.toLowerCase() === 'chronicles'
     );
 
-    const featured = chronicles.find(b => b.featured) || chronicles[0];
-    const rest = chronicles.filter(b => b.id !== featured?.id);
+    const featured = chroniclesBlogs.find(b => b.featured) || chroniclesBlogs[0];
+    const rest = chroniclesBlogs.filter(b => b.id !== featured?.id);
 
     return (
         <div>
-            {/* ── Hero ── */}
-            <div className="cat-hero chronicles-hero">
-                <div className="cat-hero-glow chronicles-glow" />
+            {/* Hero */}
+            <div className="cat-hero">
+                <div className="cat-hero-glow" />
                 <div className="container">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="cat-hero-inner"
-                    >
-                        <div className="cat-icon chronicles-icon">
-                            <BookOpen size={28} />
-                        </div>
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="cat-hero-inner">
+                        <div className="cat-icon"><BookOpen size={28} /></div>
                         <h1 className="gradient-text cat-title">Chronicles</h1>
-                        <p className="cat-subtitle">
-                            Real stories from real life — career milestones, life lessons, and the moments that shaped who I am.
-                        </p>
-
-                        {/* What is Chronicles callout */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="chronicles-about glass"
-                        >
-                            <p>
-                                🧭 From landing my first job to navigating the unknown — this is where I write about
-                                the unscripted chapters of my life. No filters, just honest stories.
-                            </p>
-                        </motion.div>
+                        <p className="cat-subtitle">Long-form stories, personal reflections, and deep dives into various topics.</p>
                     </motion.div>
                 </div>
             </div>
 
             <div className="container">
-                {/* ── Featured Story ── */}
+                {/* Featured */}
                 {!loading && featured && (
                     <AnimatePresence>
-                        <motion.div
-                            key={featured.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
-                            <Link href={`/blog/${featured.slug}`} className="featured-card glass chronicles-featured">
-                                <div
-                                    className="featured-img"
-                                    style={{ backgroundImage: `url("${featured.image_url || 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&q=80&w=800'}")` }}
-                                >
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                            <Link href={`/blog/${featured.slug}`} className="featured-card glass">
+                                <div className="featured-img" style={{ backgroundImage: `url("${featured.image_url}")` }}>
                                     <div className="featured-img-overlay" />
-                                    <span className="featured-badge chronicles-badge">✦ Featured Story</span>
+                                    <span className="featured-badge">✦ Featured</span>
                                 </div>
                                 <div className="featured-body">
-                                    <span className="cat-pill chronicles-pill">Chronicles</span>
+                                    <span className="cat-pill">{featured.category}</span>
                                     <h2 className="featured-title">{featured.title}</h2>
-                                    <p className="featured-excerpt">
-                                        {featured.content.replace(/<[^>]*>/g, '').substring(0, 220)}...
-                                    </p>
+                                    <p className="featured-excerpt">{featured.content.replace(/<[^>]*>/g, '').substring(0, 220)}...</p>
                                     <div className="featured-footer">
                                         <div className="post-meta">
                                             <Calendar size={14} />
-                                            {new Date(featured.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            {new Date(featured.created_at).toLocaleDateString('en-GB')}
                                         </div>
-                                        <span className="read-cta chronicles-cta">
-                                            Read Story <ArrowRight size={16} />
-                                        </span>
+                                        <span className="read-cta">Read Story <ArrowRight size={16} /></span>
                                     </div>
                                 </div>
                             </Link>
@@ -89,45 +57,23 @@ export default function ChroniclesPage() {
                     </AnimatePresence>
                 )}
 
-                {/* ── More Stories ── */}
+                {/* Grid */}
                 {!loading && rest.length > 0 && (
-                    <div className="section-label">
-                        <span>More Stories</span>
-                        <div className="section-line" />
-                    </div>
+                    <div className="section-label"><span>More Stories</span><div className="section-line" /></div>
                 )}
-
                 <div className="posts-grid">
                     {loading
-                        ? Array.from({ length: 3 }).map((_, i) => (
-                            <div key={i} className="skeleton-card" />
-                        ))
+                        ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton-card" />)
                         : rest.map((blog, i) => (
-                            <motion.div
-                                key={blog.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.08 }}
-                            >
+                            <motion.div key={blog.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
                                 <Link href={`/blog/${blog.slug}`} className="post-card glass">
-                                    {blog.image_url && (
-                                        <div
-                                            className="post-card-img"
-                                            style={{ backgroundImage: `url("${blog.image_url}")` }}
-                                        />
-                                    )}
+                                    {blog.image_url && <div className="post-card-img" style={{ backgroundImage: `url("${blog.image_url}")` }} />}
                                     <div className="post-card-body">
-                                        <span className="cat-pill chronicles-pill">Chronicles</span>
+                                        <span className="cat-pill">{blog.category}</span>
                                         <h3 className="post-card-title">{blog.title}</h3>
-                                        <p className="post-card-excerpt">
-                                            {blog.content.replace(/<[^>]*>/g, '').substring(0, 120)}...
-                                        </p>
+                                        <p className="post-card-excerpt">{blog.content.replace(/<[^>]*>/g, '').substring(0, 120)}...</p>
                                         <div className="post-card-footer">
-                                            <div className="post-meta">
-                                                <Calendar size={13} />
-                                                {new Date(blog.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                            </div>
+                                            <div className="post-meta"><Calendar size={13} />{new Date(blog.created_at).toLocaleDateString('en-GB')}</div>
                                             <ArrowRight size={16} className="arrow-icon" />
                                         </div>
                                     </div>
@@ -136,18 +82,7 @@ export default function ChroniclesPage() {
                         ))
                     }
                 </div>
-
-                {!loading && chronicles.length === 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="empty-chronicles glass"
-                    >
-                        <BookOpen size={48} className="empty-icon" />
-                        <h3>The first chapter is yet to be written.</h3>
-                        <p>Life stories are coming soon. Stay tuned.</p>
-                    </motion.div>
-                )}
+                {!loading && chroniclesBlogs.length === 0 && <p className="empty-state">Chronicles coming soon!</p>}
             </div>
         </div>
     );

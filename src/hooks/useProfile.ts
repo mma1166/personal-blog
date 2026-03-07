@@ -11,7 +11,7 @@ export interface Profile {
 }
 
 const DEFAULT_PROFILE: Profile = {
-    name: 'Muntasir Mahmud Amit',
+    name: 'Md Muntasir Mahmud Amit',
     bio: "CS graduate from BRAC University & SQA Engineer at Tekarsh. tech meets travel.",
     profile_url: '',
     email: 'muntasir145@gmail.com',
