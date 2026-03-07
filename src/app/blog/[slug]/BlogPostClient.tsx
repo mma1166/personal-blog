@@ -255,6 +255,7 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
             </header>
 
             <div className="post-layout-grid">
+              <div className="sidebar-spacer" />
               <div
                 ref={contentRef}
                 className="post-content"
@@ -311,7 +312,7 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
           background: rgba(15, 15, 15, 0.85) !important;
           backdrop-filter: blur(20px) !important;
           border-radius: 32px;
-          padding: 4rem;
+          padding: 4rem 2rem;
           border: 1px solid rgba(255, 255, 255, 0.1);
           box-shadow: 0 40px 100px rgba(0,0,0,0.6);
         }
@@ -375,8 +376,11 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
         }
         .post-layout-grid {
           display: grid;
-          grid-template-columns: 1fr 60px;
-          gap: 4rem;
+          grid-template-columns: 60px 1fr 60px;
+          gap: 2rem;
+        }
+        .sidebar-spacer {
+          width: 60px;
         }
         .post-content {
           font-size: 1.15rem;
@@ -461,8 +465,9 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
         }
         @media (max-width: 1024px) {
           .post-layout-grid { grid-template-columns: 1fr; }
+          .sidebar-spacer { display: none; }
           .post-sidebar { display: none; }
-          .post-main-card { padding: 3rem; }
+          .post-main-card { padding: 3rem 1.5rem; }
           .post-title { font-size: 2.5rem; }
         }
         @media (max-width: 768px) {
