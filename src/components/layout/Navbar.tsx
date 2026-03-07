@@ -27,7 +27,7 @@ export default function Navbar() {
       <style jsx>{`
         .nav-container {
           position: fixed;
-          top: 1.5rem;
+          top: 1rem;
           left: 0;
           right: 0;
           display: flex;
@@ -38,7 +38,7 @@ export default function Navbar() {
           display: flex;
           align-items: center;
           gap: 3rem;
-          padding: 0.75rem 2rem;
+          padding: 0.5rem 1.75rem;
         }
         .nav-logo {
           font-weight: 800;

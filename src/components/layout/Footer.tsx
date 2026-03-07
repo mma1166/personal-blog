@@ -1,91 +1,130 @@
 'use client';
 
+import Link from 'next/link';
 import { Github, Linkedin, Mail, Facebook, ExternalLink } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="footer-minimal glass">
-      <div className="container footer-content">
-        <div className="footer-links">
-          <a href="https://portfolio.muntasiramit.me" target="_blank" rel="noopener noreferrer" className="portfolio-link">
-            Portfolio <ExternalLink size={14} />
-          </a>
-          <div className="divider" />
-          <div className="social-row">
-            <a href="https://facebook.com/mma1166" target="_blank" rel="noopener noreferrer" title="Facebook"><Facebook size={18} /></a>
-            <a href="https://github.com/mma1166" target="_blank" rel="noopener noreferrer" title="GitHub"><Github size={18} /></a>
-            <a href="https://linkedin.com/in/muntasiramit" target="_blank" rel="noopener noreferrer" title="LinkedIn"><Linkedin size={18} /></a>
-            <a href="mailto:muntasir145@gmail.com" title="Email"><Mail size={18} /></a>
+    <footer className="footer-section">
+      <div className="container">
+        <div className="footer-content">
+          <div className="footer-left">
+            <Link href="/" className="brand-logo gradient-text">MUNTASIR</Link>
+          </div>
+          
+          <nav className="footer-center">
+            <Link href="/" className="nav-link">Home</Link>
+            <Link href="/tech" className="nav-link">Tech</Link>
+            <Link href="/travel" className="nav-link">Travel</Link>
+            <Link href="/chronicles" className="nav-link">Chronicles</Link>
+          </nav>
+          
+          <div className="footer-right">
+            <div className="social-links">
+              <a href="https://github.com/mma1166" target="_blank" rel="noopener noreferrer"><Github size={16} /></a>
+              <a href="https://linkedin.com/in/muntasiramit" target="_blank" rel="noopener noreferrer"><Linkedin size={16} /></a>
+              <a href="https://facebook.com/mma1166" target="_blank" rel="noopener noreferrer"><Facebook size={16} /></a>
+              <a href="mailto:muntasir145@gmail.com"><Mail size={16} /></a>
+            </div>
+            <span className="footer-divider" />
+            <a href="https://portfolio.muntasiramit.me" target="_blank" rel="noopener noreferrer" className="portfolio-cta">
+              Portfolio <ExternalLink size={12} />
+            </a>
           </div>
         </div>
-        <p className="copyright">&copy; {new Date().getFullYear()} Muntasir Amit</p>
       </div>
 
       <style jsx>{`
-        .footer-minimal {
+        .footer-section {
+          width: 100%;
+          background: rgba(10, 10, 15, 0.9);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-top: 1px solid var(--glass-border);
+          padding: 1rem 0;
           margin-top: 4rem;
-          padding: 2rem 0;
-          border-radius: 30px 30px 0 0;
-          border-bottom: none;
         }
         .footer-content {
           display: flex;
           justify-content: space-between;
           align-items: center;
-        }
-        .footer-links {
-          display: flex;
-          align-items: center;
           gap: 2rem;
         }
-        .portfolio-link {
+        .footer-left, .footer-right {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          font-weight: 700;
-          color: var(--accent);
-          font-size: 0.9rem;
-          letter-spacing: 0.5px;
-          transition: transform 0.3s;
+          gap: 1rem;
         }
-        .portfolio-link:hover {
-          transform: translateY(-2px);
+        .brand-logo {
+          font-size: 1rem;
+          font-weight: 900;
+          letter-spacing: 1.5px;
         }
-        .divider {
+        .footer-divider {
           width: 1px;
-          height: 15px;
-          background: rgba(255,255,255,0.1);
+          height: 14px;
+          background: var(--glass-border);
         }
-        .social-row {
+        .footer-text {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          opacity: 0.8;
+          white-space: nowrap;
+        }
+        .footer-center {
+          display: flex;
+          gap: 1.5rem;
+        }
+        .nav-link {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+          color: white;
+        }
+        .social-links {
+          display: flex;
+          gap: 0.75rem;
+        }
+        .social-links a {
+          color: var(--text-muted);
+          transition: all 0.3s ease;
           display: flex;
           align-items: center;
-          gap: 1.25rem;
         }
-        .social-row a {
-          color: var(--text-muted);
-          transition: all 0.3s;
-        }
-        .social-row a:hover {
+        .social-links a:hover {
           color: white;
           transform: translateY(-2px);
         }
-        .copyright {
-          color: var(--text-muted);
-          font-size: 0.8rem;
-          font-weight: 500;
-          opacity: 0.6;
+        .portfolio-cta {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: var(--accent);
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          white-space: nowrap;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
+          .footer-center {
+            display: none;
+          }
+        }
+        @media (max-width: 600px) {
           .footer-content {
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
             text-align: center;
           }
-          .footer-links {
-            flex-direction: column;
-            gap: 1rem;
+          .footer-divider {
+            display: none;
           }
-          .divider { display: none; }
+          .footer-left, .footer-right {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
         }
       `}</style>
     </footer>
