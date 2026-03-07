@@ -34,6 +34,30 @@ export default function EditorToolbar({ editor, onImageUpload }: EditorToolbarPr
         }
     };
 
+    const setFontSize = (size: string) => {
+        if (size === 'default') {
+            (editor.commands as any).unsetFontSize();
+        } else {
+            (editor.commands as any).setFontSize(size);
+        }
+    };
+
+    const handleIndent = () => {
+        if (editor.isActive('bulletList') || editor.isActive('orderedList')) {
+            editor.chain().focus().sinkListItem('listItem').run();
+        } else {
+            (editor.commands as any).indent();
+        }
+    };
+
+    const handleOutdent = () => {
+        if (editor.isActive('bulletList') || editor.isActive('orderedList')) {
+            editor.chain().focus().liftListItem('listItem').run();
+        } else {
+            (editor.commands as any).outdent();
+        }
+    };
+
     return (
         <div className="toolbar glass">
             <button
@@ -74,8 +98,27 @@ export default function EditorToolbar({ editor, onImageUpload }: EditorToolbarPr
 
             <div className="divider" />
 
-            <button onClick={() => (editor.commands as any).indent()} title="Indent"><Indent size={18} /></button>
-            <button onClick={() => (editor.commands as any).outdent()} title="Outdent"><Outdent size={18} /></button>
+            <select 
+                onChange={(e) => setFontSize(e.target.value)}
+                className="font-size-select"
+                value={editor.getAttributes('textStyle').fontSize || 'default'}
+            >
+                <option value="default">Size</option>
+                <option value="12px">12</option>
+                <option value="14px">14</option>
+                <option value="16px">16</option>
+                <option value="18px">18</option>
+                <option value="20px">20</option>
+                <option value="24px">24</option>
+                <option value="30px">30</option>
+                <option value="36px">36</option>
+                <option value="48px">48</option>
+            </select>
+
+            <div className="divider" />
+
+            <button onClick={handleIndent} title="Indent"><Indent size={18} /></button>
+            <button onClick={handleOutdent} title="Outdent"><Outdent size={18} /></button>
 
             <div className="divider" />
 
@@ -129,6 +172,19 @@ export default function EditorToolbar({ editor, onImageUpload }: EditorToolbarPr
           width: 1px;
           background: var(--glass-border);
           margin: 0 0.5rem;
+        }
+        .font-size-select {
+          background: var(--background);
+          border: 1px solid var(--glass-border);
+          color: white;
+          padding: 0.2rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          cursor: pointer;
+          outline: none;
+        }
+        .font-size-select:hover {
+          border-color: var(--accent);
         }
       `}</style>
         </div>

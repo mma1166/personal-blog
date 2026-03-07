@@ -8,6 +8,7 @@ import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Youtube from '@tiptap/extension-youtube';
 import Placeholder from '@tiptap/extension-placeholder';
+import { TextStyle } from '@tiptap/extension-text-style';
 import EditorToolbar from './EditorToolbar';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -67,6 +68,51 @@ const Indent = Extension.create({
                 });
                 if (dispatch) dispatch(tr);
                 return true;
+            },
+        } as any;
+    },
+});
+
+const FontSize = Extension.create({
+    name: 'fontSize',
+    addOptions() {
+        return {
+            types: ['textStyle'],
+        };
+    },
+    addGlobalAttributes() {
+        return [
+            {
+                types: this.options.types,
+                attributes: {
+                    fontSize: {
+                        default: null,
+                        parseHTML: element => element.style.fontSize.replace(/['"]+/g, ''),
+                        renderHTML: attributes => {
+                            if (!attributes.fontSize) {
+                                return {};
+                            }
+                            return {
+                                style: `font-size: ${attributes.fontSize}`,
+                            };
+                        },
+                    },
+                },
+            },
+        ];
+    },
+    addCommands() {
+        return {
+            setFontSize: (fontSize: string) => ({ chain }: any) => {
+                return chain()
+                    .setMark('textStyle', { fontSize })
+                    .run();
+            },
+            unsetFontSize: () => ({ chain }: any) => {
+                return chain()
+                    .setMark('textStyle', { fontSize: null })
+                    .removeEmptyTextStyle()
+                    .run();
             },
         } as any;
     },
@@ -266,9 +312,11 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         extensions: [
             StarterKit,
             Underline,
+            TextStyle,
+            FontSize,
             Link.configure({ openOnClick: false }),
             ResizableImage,
-            TextAlign.configure({ types: ['heading', 'paragraph'] }),
+            TextAlign.configure({ types: ['heading', 'paragraph', 'listItem'] }),
             Indent,
             Youtube.configure({ controls: false }),
             Placeholder.configure({ placeholder: 'Write your story here...' }),

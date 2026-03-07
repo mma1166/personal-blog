@@ -403,6 +403,19 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
           cursor: zoom-in;
           box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
+        .post-content :global(ul), .post-content :global(ol) {
+          padding-left: 2.5rem;
+          margin-bottom: 2rem;
+        }
+        .post-content :global(ul) {
+          list-style-type: disc;
+        }
+        .post-content :global(ol) {
+          list-style-type: decimal;
+        }
+        .post-content :global(li) {
+          margin-bottom: 0.75rem;
+        }
         .share-menu-sticky {
           position: sticky;
           top: 8rem;
