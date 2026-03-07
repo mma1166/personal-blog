@@ -389,6 +389,12 @@ main {
   font-size: 1.05rem;
 }
 
+/* ── Text Alignment ── */
+.ProseMirror .has-text-align-left, .post-content .has-text-align-left { text-align: left; }
+.ProseMirror .has-text-align-center, .post-content .has-text-align-center { text-align: center; }
+.ProseMirror .has-text-align-right, .post-content .has-text-align-right { text-align: right; }
+.ProseMirror .has-text-align-justify, .post-content .has-text-align-justify { text-align: justify; }
+
 /* ════════════════════════════════════════
    RESPONSIVE
 ════════════════════════════════════════ */

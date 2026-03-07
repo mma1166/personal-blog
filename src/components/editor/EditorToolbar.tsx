@@ -3,7 +3,7 @@
 import {
     Bold, Italic, Underline, List, ListOrdered,
     Image as ImageIcon, Upload, Link as LinkIcon,
-    Type, AlignLeft, AlignCenter, AlignRight,
+    Type, AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Youtube, Code, Indent, Outdent
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
@@ -67,6 +67,10 @@ export default function EditorToolbar({ editor, onImageUpload }: EditorToolbarPr
                 onClick={() => editor.chain().focus().setTextAlign('right').run()}
                 className={editor.isActive({ textAlign: 'right' }) ? 'is-active' : ''}
             ><AlignRight size={18} /></button>
+            <button
+                onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+                className={editor.isActive({ textAlign: 'justify' }) ? 'is-active' : ''}
+            ><AlignJustify size={18} /></button>
 
             <div className="divider" />
 
