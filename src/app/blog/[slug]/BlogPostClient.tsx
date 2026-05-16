@@ -398,10 +398,14 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
         }
         .post-content :global(p) {
           margin-bottom: 2rem;
-          text-align: left !important;
+          text-align: justify !important;
+          hyphens: auto;
+          -webkit-hyphens: auto;
         }
         .post-content :global(div) {
-          text-align: left !important;
+          text-align: justify !important;
+          hyphens: auto;
+          -webkit-hyphens: auto;
         }
         .post-content :global(img) {
           max-width: 100%;
