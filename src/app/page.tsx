@@ -650,11 +650,29 @@ export default function Home() {
         @media (max-width: 640px) {
           .hero-banner { padding: 5.5rem 0 3rem; }
           .hero-inner { flex-direction: column; text-align: center; gap: 1.75rem; }
-          .hero-bio { margin: 0 auto 1.5rem; }
-          .hero-stats { justify-content: center; }
+          .hero-bio { margin: 0 auto 1.5rem; font-size: 0.95rem; }
+          .hero-stats { justify-content: center; gap: 1.25rem; }
           .hero-avatar { width: 120px; height: 120px; }
-          .hero-name { font-size: 2rem; }
+          .hero-name { font-size: 2.25rem; }
+          .hero-bottom-row { justify-content: center; gap: 1.5rem; }
+          .stat-num { font-size: 1.5rem; }
           .posts-grid { grid-template-columns: 1fr; }
+          .filter-row { 
+            margin: 2rem 0 1.5rem; 
+            overflow-x: auto; 
+            flex-wrap: nowrap; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+          }
+          .filter-row::-webkit-scrollbar { display: none; }
+          .filter-pill { white-space: nowrap; }
+        }
+        @media (max-width: 480px) {
+          .hero-name { font-size: 1.8rem; }
+          .hero-title-tag { font-size: 0.7rem; padding: 0.25rem 0.75rem; }
+          .stat-num { font-size: 1.3rem; }
+          .stat-lbl { font-size: 0.65rem; }
+          .portfolio-btn { width: 100%; text-align: center; }
         }
       `}</style>
     </div>

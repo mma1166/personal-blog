@@ -471,11 +471,21 @@ export default function BlogPostClient({ blogData }: { blogData: any }) {
           .post-title { font-size: 2.5rem; }
         }
         @media (max-width: 768px) {
-          .post-container { padding-top: 5rem; }
-          .post-main-card { padding: 2rem 1.5rem; border-radius: 0; border: none; }
-          .post-meta-detailed { flex-direction: column; gap: 1.5rem; }
-          .post-hero-bg { height: 40vh; }
-          .post-title { font-size: 2rem; }
+          .post-container { padding-top: 5rem; padding-left: 0.5rem; padding-right: 0.5rem; }
+          .post-main-card { padding: 2rem 1.25rem; border-radius: 20px; width: 100%; box-sizing: border-box; overflow: hidden; }
+          .post-meta-detailed { flex-direction: column; gap: 1rem; align-items: flex-start; }
+          .meta-item { width: 100%; }
+          .meta-divider { display: none; }
+          .post-hero-bg { height: 35vh; }
+          .post-title { font-size: 2rem; text-align: left; margin-bottom: 1.5rem; word-wrap: break-word; hyphens: auto; }
+          .post-header { text-align: left; padding-bottom: 2rem; margin-bottom: 2.5rem; }
+          .post-content { font-size: 1.05rem; line-height: 1.8; overflow-wrap: break-word; word-break: break-word; }
+          .post-content :global(h2), .post-content :global(h3) { font-size: 1.6rem; margin: 2.5rem 0 1rem; }
+          .post-content :global(img) { border-radius: 12px; margin: 2rem 0; width: 100%; }
+        }
+        @media (max-width: 480px) {
+          .post-main-card { padding: 1.5rem 1rem; border-radius: 16px; margin: 0; }
+          .post-title { font-size: 1.75rem; }
         }
       `}</style>
       </div>
