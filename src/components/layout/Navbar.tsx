@@ -64,28 +64,11 @@ export default function Navbar() {
         }
         @media (max-width: 640px) {
           .nav-content {
-            gap: 0.75rem;
-            padding: 0.5rem 0.75rem;
-            width: 95%;
-            justify-content: space-between;
-          }
-          .nav-links {
-            gap: 0.75rem;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
           }
           .nav-links span {
             display: none;
-          }
-          .nav-logo {
-            font-size: 1rem;
-            letter-spacing: 1px;
-          }
-        }
-        @media (max-width: 380px) {
-          .nav-content {
-            gap: 0.5rem;
-          }
-          .nav-links {
-            gap: 0.5rem;
           }
         }
       `}</style>

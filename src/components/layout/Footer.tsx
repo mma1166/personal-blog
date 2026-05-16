@@ -115,27 +115,15 @@ export default function Footer() {
         @media (max-width: 600px) {
           .footer-content {
             flex-direction: column;
-            gap: 1.5rem;
-            padding: 1rem 0;
-          }
-          .footer-left {
-            order: 1;
-          }
-          .footer-right {
-            order: 2;
-            flex-direction: column;
             gap: 1rem;
+            text-align: center;
           }
           .footer-divider {
             display: none;
           }
-          .social-links {
-            gap: 1.25rem;
-          }
-          .social-links a {
-            padding: 0.5rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
+          .footer-left, .footer-right {
+            flex-direction: column;
+            gap: 0.5rem;
           }
         }
       `}</style>
