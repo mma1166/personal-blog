@@ -218,8 +218,22 @@ export default function BlogPostClient({ blogData }: { blogData: BlogData }) {
           }
           .post-content :global(*) {
             color: inherit !important;
-            font: inherit !important;
             max-width: 100%;
+          }
+          .post-content :global(strong),
+          .post-content :global(b) {
+            font-weight: 700 !important;
+          }
+          .post-content :global(em),
+          .post-content :global(i) {
+            font-style: italic !important;
+          }
+          .post-content :global(u) {
+            text-decoration: underline !important;
+          }
+          .post-content :global(s),
+          .post-content :global(strike) {
+            text-decoration: line-through !important;
           }
           .post-content :global(p) {
             margin: 0 0 1rem;
