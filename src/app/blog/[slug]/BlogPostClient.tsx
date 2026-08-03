@@ -5,26 +5,32 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Share2, Facebook, Linkedin, Clock, X, ZoomIn, ZoomOut } from "lucide-react";
 
 type BlogData = {
-  title?: string;
-  content?: string;
+  title: string;
+  content: string;
   author?: string;
   created_at?: string;
-  date?: string;
   image_url?: string;
   imageUrl?: string;
 };
 
-export default function BlogPostClient({ blogData }: { blogData: BlogData }) {
-  const initialPost: BlogData | null = blogData
-    ? {
-        ...blogData,
-        author: blogData.author || 'Md Muntasir Mahmud Amit',
-        date: blogData.created_at ? new Date(blogData.created_at).toLocaleDateString('en-GB') : (blogData.date || 'Today'),
-        imageUrl: blogData.image_url || blogData.imageUrl,
-      }
-    : null;
+type BlogPost = {
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+  imageUrl: string;
+};
 
-  const [post] = useState<BlogData | null>(() => initialPost);
+export default function BlogPostClient({ blogData }: { blogData: BlogData }) {
+  const initialPost: BlogPost = {
+    title: blogData.title || 'Untitled post',
+    content: blogData.content || '',
+    author: blogData.author || 'Md Muntasir Mahmud Amit',
+    date: blogData.created_at ? new Date(blogData.created_at).toLocaleDateString('en-GB') : 'Today',
+    imageUrl: blogData.image_url || blogData.imageUrl || '',
+  };
+
+  const [post] = useState<BlogPost>(() => initialPost);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
@@ -78,8 +84,6 @@ export default function BlogPostClient({ blogData }: { blogData: BlogData }) {
     }
   };
 
-  if (!post) return <div className="container" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>;
-
   return (
     <>
       {/* Lightbox modal */}
@@ -122,7 +126,7 @@ export default function BlogPostClient({ blogData }: { blogData: BlogData }) {
       </AnimatePresence>
 
       <div className="post-view">
-        <div className="post-hero" style={{ backgroundImage: `url('${post.imageUrl}')` }}>
+        <div className="post-hero" style={{ backgroundImage: post.imageUrl ? `url('${post.imageUrl}')` : 'none' }}>
           <div className="hero-overlay" />
         </div>
 
@@ -133,7 +137,7 @@ export default function BlogPostClient({ blogData }: { blogData: BlogData }) {
 
               <div className="post-meta-detailed">
                 <div className="meta-item">
-                  <div className="author-avatar">{post.author?.charAt(0)}</div>
+                  <div className="author-avatar">{post.author.charAt(0)}</div>
                   <div className="meta-text">
                     <span className="label">Author</span>
                     <span className="value">{post.author}</span>
